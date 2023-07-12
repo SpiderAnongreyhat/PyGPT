@@ -1,12 +1,19 @@
-import time
-import openai
+import time, os
+try:
+	import openai
+except:
+	os.system("pip install openai")
 import os
 import requests
 import json
 import random
 from pyfiglet import Figlet
-from termcolor import colored, cprint
+try:
+	from termcolor import colored, cprint
+except:
+	os.system("pip install termcolor")
 from colorama import init
+import platform
 
 init()
 
@@ -23,6 +30,8 @@ Keys = 'chatgpt_config'
 # create the config directory if it doesn't exist
 if not os.path.exists(Keys):
     os.mkdir(Keys)
+if not os.path.exists("/sdcard/Text2Image"):
+	os.mkdir("/sdcard/Text2Image")
 
 # check if the api key file exists
 api_key_file = os.path.join(Keys, 'openai.api_key.txt')
@@ -48,26 +57,31 @@ else:
     for char in "\nAPI key successfully saved.":
         print(colored(char, "green"), end='', flush=True)
         time.sleep(0.05)
-    
 
-    
 time.sleep(1.1)
 
 # Define the main menu function
 custom_fig = Figlet(font='graffiti')
 def main_menu():
     os.system('cls' if os.name == 'nt' else 'clear')
-    print(colored(custom_fig.renderText('   ChatGpt'), color='cyan'))    
+    print(colored(custom_fig.renderText('   ChatGpt'), color='cyan'))
+    print(colored("version 1.1", "yellow").center(110))
+      
+    authors = "TheNooB | Spider Anongreyhat"
+    github = "TheNooB4 | spider863644"
+    whatsapp = "+233245222358 | +2349052863644"
     
     print(colored("="*59, "green"))
-    print(colored("\nAuthor: TheNooB\nGithub: https://github.com/TheNooB4\nContact: +233500776941\nVersion: 0.1\n","magenta"))
+    print(colored("Authors: ", "white") + colored(authors, "cyan"))
+    print(colored("Github: ", "white") + colored(github, "green"))
+    print(colored("WhatsApp: ", "white") + colored(whatsapp, "magenta"))
     print(colored("="*59, "green"))
     time.sleep(1)
-    
-    
-    print(colored("\n  1. Text to Image", "yellow"))
-    print(colored("  2. Chat with AI", "yellow"))
-    print(colored("  3. Exit", "red"))
+
+    print(colored("\n  1. Text To Image", "yellow"))
+    print(colored("  2. Chat With AI", "yellow"))
+    print(colored("  3. Change Api Key", "yellow"))
+    print(colored("  4. Exit", "red"))
 
     try:
         choice = int(input(colored("\n What would you like to do? ", "cyan")))
@@ -80,14 +94,21 @@ def main_menu():
             input("\n\n Press Enter to continue...")
             main_menu()
         elif choice == 3:
-           # os.system('cls' if os.name == 'nt' else 'clear')   
-            os.system("clear")
-            print(colored(custom_fig.renderText('ChatGpt'), color='cyan'))
-            for letter in list(colored("\n Thank you for using ChatGpt. Goodbye!\n\n", "yellow")):
+           os.remove("chatgpt_config/openai.api_key.txt")
+           os.system("python3 Gpt.py")
+           
+        elif choice == 4:
+           if platform.system() == "Windows":
+           	os.system("cls")
+
+           else:
+           	os.system("clear")
+           print(colored(custom_fig.renderText('ChatGpt'), color='cyan'))
+           for letter in list(colored("\n Thank you for using ChatGpt. Goodbye!\n\n", "yellow")):
                 print(letter, end='', flush=True)
                 time.sleep(0.05)
-            time.sleep(1)
-            os.system('cls' if os.name == 'nt' else 'clear')
+           time.sleep(1)
+           os.system('cls' if os.name == 'nt' else 'clear')
         else:
             raise ValueError()
     except ValueError:
@@ -101,20 +122,20 @@ def text_to_image():
     os.system("clear")
     print(colored("="*59, "green"))
 
-    print("""\033[36m    
-      _______        _   ___  _                 
-     |__   __|      | | |__ \(_)                
-        | | _____  _| |_   ) |_ _ __ ___   __ _ 
+    print("""\033[36m
+      _______        _   ___  _
+     |__   __|      | | |__ \(_)
+        | | _____  _| |_   ) |_ _ __ ___   __ _
         | |/ _ \ \/ / __| / /| | '_ ` _ \ / _` |
         | |  __/>  <| |_ / /_| | | | | | | (_| |
         |_|\___/_/\_\\__|____|_|_| |_| |_|\__, |
                                            __/ |
-                                           |___/ 
+                                           |___/
                                       \033[0m""")
 
     print(colored("="*59, "green"))
-    
-   
+
+
     # Prompt user for text input
     text = input("\n \033[1;34mEnter the text to generate an image from: \033[0m")
     # Prompt user for number of images to generate
@@ -125,7 +146,7 @@ def text_to_image():
 
     for i in range(num_images):
         #Generate a random filename for each image
-        
+
         filename = f"result_{i+1}_{random.randint(1000,9999)}.jpg"
 
         # Use API to generate image
@@ -133,7 +154,6 @@ def text_to_image():
             prompt=text,
             n=1,
             size="1024x1024",
-            model="image-alpha-001",
             response_format="url"
         )
 
@@ -142,12 +162,12 @@ def text_to_image():
 
         # Download image and save to local storage
         response = requests.get(image_url)
-        with open(f"/data/data/com.termux/files/home/storage/shared/Gpt/{filename}", 'wb') as f:
+        with open(f"/sdcard/Text2Image/{filename}", 'wb') as f:
             f.write(response.content)
 
         # Inform user of successful save location
         print(colored("="*59, "green"))
-        print(f"\033[1;32mImage {i+1} saved as \033[1;36m{filename}\033[1;32m in \033[1;35ma folder called Gpt inside your storage\033[1;32m directory.\033[0m")
+        print(f"\033[1;32mImage {i+1} saved as \033[1;36m{filename}\033[1;32m in \033[1;35ma folder called Text2Image inside your storage\033[1;32m directory.\033[0m")
         print(colored("="*59, "green"))
 
 
@@ -160,7 +180,7 @@ def chat_with_ai():
     conversation_history = ""
     os.system("clear")
     print(colored("="*59, "green"))
-    print(colored(custom_fig.renderText('      Ask_AI'), color='cyan'))    
+    print(colored(custom_fig.renderText('      Ask_AI'), color='cyan'))
     print(colored("\n Start chatting with AI","green"))
     print(colored("\n You can type 'exit', 'quit', or 'bye'\n to end the conversation.","green"))
     print(colored("="*59, "green"))
@@ -177,7 +197,7 @@ def chat_with_ai():
             conversation_history += f"User: {user_input}\n"
 
             # Set up the OpenAI API request
-            model_engine = "text-davinci-002" # Change this to the appropriate GPT-3 model for your use case
+            model_engine = "text-davinci-003" # Change this to the appropriate GPT-3 model for your use case
             prompt_with_history = f"{prompt}\n{conversation_history}\nAI:"
 
             response = openai.Completion.create(
@@ -186,7 +206,8 @@ def chat_with_ai():
                 max_tokens=1024,
                 n=1,
                 stop=None,
-                temperature=0.5,
+                temperature=0.7,
+                timeout=10
             )
 
             # Get the AI's response
